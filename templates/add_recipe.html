@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Add Recipe</title>
+</head>
+<body>
+        <div id="menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/add_recipe">Add Recipe</a></li>
+            <li><a href="/my_recipes">My Recipes</a></li>
+        </ul>
+    </div><h2>Recipes:</h2>
+        <div class="button-container">
+            <a href="/recipe/salad" class="button">Salad</a>
+            <a href="/recipe/cake" class="button">Cake</a>
+            <a href="/recipe/pizza" class="button">Pizza</a>
+        </div>
+    <h2>Add Recipe</h2>
+    <form action="/add_recipe" method="POST">
+        <label for="category">Category:</label>
+        <select id="category" name="category" required>
+            <option value="salad">Salad</option>
+            <option value="cake">Cake</option>
+            <option value="pizza">Pizza</option>
+        </select><br><br>
+        <label for="recipe_name">Recipe Name:</label>
+        <input type="text" id="recipe_name" name="recipe_name" required><br><br>
+        <label for="recipe_description">Recipe Description:</label>
+        <textarea id="recipe_description" name="recipe_description" required></textarea><br><br>
+        <input type="submit" value="Add Recipe">
+    </form>
+</body>
+</html>

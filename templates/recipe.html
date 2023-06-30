@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Recipes</title>
+    <style>
+        .recipe-button {
+            margin-bottom: 10px;
+            display: block;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            width: 150px;
+            font-size: 1.3em;
+        }
+        .recipe-details {
+            display: none;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .flash-messages {
+            margin-bottom: 10px;
+        }
+        .flash-message {
+            padding: 10px;
+            background-color: #f5f5f5;
+        }
+        .comment-frame {
+            background-color: #ebebeb;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+        .comment-info {
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+        .comment-uploader {
+            margin-right: 8px;
+            font-style: italic;
+        }
+        .comment-time {
+            color: #888;
+            float: right;
+            font-weight: normal;
+        }
+        .comment-description {
+            margin-top: 5px;
+        }
+        .delete-comment-button {
+            background-color: #6666;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .rating-section {
+            margin-top: 15px;
+        }
+        .stars {
+            display: inline-block;
+            cursor: pointer;
+        }
+        .star {
+            font-size: 25px;
+            color: #ccc;
+        }
+        .current-rating,
+        .average-rating {
+            margin-top: 5px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.recipe-button').click(function() {
+                $(this).next('.recipe-details').slideToggle();
+            });
+
+            $('.delete-comment-button').click(function() {
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    $(this).closest('.delete-comment-form').submit();
+                }
+            });
+
+            $('.stars .star').click(function() {
+                var rating = $(this).attr('data-rating');
+                var recipeId = $(this).parent().attr('data-recipe-id');
+                $.ajax({
+                    url: '/rate_recipe',
+                    method: 'POST',
+                    data: { recipe_id: recipeId, rating: rating },
+                    success: function(response) {
+                    },
+                    error: function(xhr, status, error) {
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/add_recipe">Add Recipe</a></li>
+            <li><a href="/my_recipes">My Recipes</a></li>
+        </ul>
+    </div>
+    <h2>Recipes:</h2>
+        <div class="button-container">
+            <a href="/recipe/salad" class="button">Salad</a>
+            <a href="/recipe/cake" class="button">Cake</a>
+            <a href="/recipe/pizza" class="button">Pizza</a>
+        </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="recipe-list">
+        {% for category, recipes in recipe_categories.items() %}
+            {% if recipes %}
+                <h2>{{ category.capitalize() }} Recipes:</h2>
+                {% for recipe in recipes %}
+                    <button class="recipe-button">{{ recipe[1] }}</button>
+                    <div class="recipe-details">
+                        <h3>{{ recipe[1] }}</h3>
+                        <p>Recipe description: {{ recipe[2] }}</p>
+                        <p>Uploaded on: {{ recipe[3] }}</p>
+                        <p>Uploaded by: {{ recipe[4] }}</p>
+                        <form action="/add_comment" method="POST">
+                            <input type="hidden" name="recipe_id" value="{{ recipe[0] }}">
+                            <label for="comment">Add a comment:</label>
+                            <input type="text" name="comment" id="comment" required>
+                            <button type="submit">Submit</button>
+                        </form>
+                        <h4>Comments:</h4>
+                        {% for comment in recipe_comments[recipe[0]] %}
+                            <div class="comment-frame">
+                                <p class="comment-info">
+                                    <span class="comment-uploader">{{ comment[4] }}</span>
+                                    <span class="comment-time">{{ comment[3] }}</span>
+                                    {% if 'username' in session and comment[4] == session['username'] %}
+                                        <form class="delete-comment-form" action="/delete_comment" method="POST">
+                                            <input type="hidden" name="comment_id" value="{{ comment[0] }}">
+                                            <button class="delete-comment-button" type="submit">Delete</button>
+                                        </form>
+                                    {% endif %}
+                                </p>
+                                <p class="comment-description">{{ comment[2] }}</p>
+                            </div>
+                        {% endfor %}
+                        <div class="rating-section" data-recipe-id="{{ recipe[0] }}">
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h1>Empty</h1>
+            {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>

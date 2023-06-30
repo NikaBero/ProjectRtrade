@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Recipes</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .recipe-card {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+        }
+        .recipe-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .recipe-description {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .recipe-datetime {
+            font-size: 12px;
+            text-align: right;
+            color: #999;
+        }
+        .delete-button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>My Recipes</h2>
+    <div id="menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/add_recipe">Add Recipe</a></li>
+            <li><a href="/my_recipes">My Recipes</a></li>
+        </ul>
+    </div>
+<h2>Recipes:</h2>
+        <div class="button-container">
+            <a href="/recipe/salad" class="button">Salad</a>
+            <a href="/recipe/cake" class="button">Cake</a>
+            <a href="/recipe/pizza" class="button">Pizza</a>
+        </div>
+    <div class="recipe-list">
+        {% if recipes %}
+            {% for recipe in recipes %}
+            <div class="recipe-card">
+                <div class="recipe-title">{{ recipe[1] }}</div>
+                <div class="recipe-datetime">{{ recipe[3] }}</div>
+                <div class="recipe-description">{{ recipe[2] }}</div>
+                <form action="/delete_recipe" method="POST">
+                    <input type="hidden" name="recipe_id" value="{{ recipe[0] }}">
+                    <input type="submit" value="Delete" class="delete-button">
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <h2>Empty</h2>
+        {% endif %}
+    </div>
+</body>
+</html>

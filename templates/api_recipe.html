@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipe API</title>
+</head>
+<body>
+    <h1>Recipe API</h1>
+    <li><a href="/">Home</a></li>
+    <form id="recipeForm" action="/api_recipe" method="POST">
+        <label for="ingredients">Enter ingredients (one per line):</label><br>
+        <textarea id="ingredients" name="ingredients" rows="4" cols="50"></textarea><br>
+        <input type="submit" value="Get Recipe">
+    </form>
+
+    <div id="recipeInstructions">
+        {% for title, ingredients in zipped_data %}
+            <h2>{{ title }}</h2>
+            <ul>
+                {% for ingredient in ingredients %}
+                    <li>{{ ingredient }}</li>
+             {% endfor %}
+          </ul>
+        {% endfor %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#recipeForm').submit(function(event) {
+                event.preventDefault();
+
+                var ingredients = $('#ingredients').val();
+
+                $.ajax({
+                    url: '/api_recipe',
+                    type: 'POST',
+                    data: { ingredients: ingredients },
+                    success: function(response) {
+                        var apiResponse = response.api_response;
+
+                        if (apiResponse) {
+                            var instructions = apiResponse.instructions;
+
+                            if (instructions.length > 0) {
+                                var html = '';
+
+                                for (var i = 0; i < instructions.length; i++) {
+                                    html += '<h2>' + instructions[i].title + '</h2>';
+                                    html += '<ol>';
+
+                                    for (var j = 0; j < instructions[i].instructions.length; j++) {
+                                        html += '<li>' + instructions[i].instructions[j] + '</li>';
+                                    }
+
+                                    html += '</ol>';
+                                }
+
+                                $('#recipeInstructions').html(html);
+                            } else {
+                                $('#recipeInstructions').html('<p>No recipe found for the provided ingredients.</p>');
+                            }
+                        } else {
+                            $('#recipeInstructions').html('<p>An error occurred while fetching the recipe.</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#recipeInstructions').html('<p>An error occurred while fetching the recipe.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

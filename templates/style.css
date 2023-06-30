@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#menu {
+    background-color: #f0f0f0;
+    padding: 10px;
+}
+
+#menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#menu ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#menu ul li a {
+    text-decoration: none;
+    color: #000;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
